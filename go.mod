@@ -1,4 +1,4 @@
-module github.com/ksanta/word-stallion/ondisconnect
+module github.com/ksanta/chat
 
 require (
 	github.com/aws/aws-lambda-go v1.16.0
