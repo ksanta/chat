@@ -10,11 +10,20 @@ import (
 	"os"
 )
 
-var svc = dynamodb.New(session.New())
+var (
+	svc       *dynamodb.DynamoDB
+	tableName *string
+)
+
+func init() {
+	mySession := session.Must(session.NewSession())
+	svc = dynamodb.New(mySession)
+	tableName = aws.String(os.Getenv("TABLE_NAME"))
+}
 
 func handler(request events.APIGatewayWebsocketProxyRequest) (events.APIGatewayProxyResponse, error) {
 	input := &dynamodb.DeleteItemInput{
-		TableName: aws.String(os.Getenv("TABLE_NAME")),
+		TableName: tableName,
 		Key: map[string]*dynamodb.AttributeValue{
 			"connectionId": {
 				S: aws.String(request.RequestContext.ConnectionID),
