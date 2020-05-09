@@ -3,13 +3,17 @@
 <head>
     <title>Chat</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <script type="text/javascript" src="app.js"></script>
 </head>
 <body>
-<div id="log"></div>
-<form id="form">
-    <input type="submit" value="Send"/>
-    <input type="text" id="msg" size="64" autofocus/>
-</form>
+<div class="container-fluid">
+    <div id="log"></div>
+    <nav class="navbar fixed-bottom navbar-light bg-light">
+        <form class="form-inline w-100" id="form">
+            <input class="form-control w-100" id="msg" type="search" aria-label="Chat">
+        </form>
+    </nav>
+</div>
 </body>
 </html>
