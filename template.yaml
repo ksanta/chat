@@ -1,14 +1,15 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Word Stallion
+  Chat
 
-  A game where you guess the right definition of a word to move your horse to the finish line.
+  A simple chat application where no-one is identified, no history is kept and messages go only
+  to the people connected at the time the message was sent.
 
 Parameters:
   TableName:
     Type: String
-    Default: 'wordstallion_connections'
+    Default: 'chat_connections'
     Description: (Required) The name of the new DynamoDB to store connection identifiers for each connected clients. Minimum 3 characters
     MinLength: 3
     MaxLength: 50
