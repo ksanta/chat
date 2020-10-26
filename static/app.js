@@ -48,4 +48,19 @@ window.onload = function () {
         item.innerHTML = "<b>Your browser does not support WebSockets.</b>";
         appendLog(item);
     }
+
 };
+
+$(document).ready(function () {
+    // Show room selection modal on startup
+    $("#room-modal").modal("show");
+});
+
+// Make room text box active when the modal shows
+$('#room-modal').on('shown.bs.modal', function () {
+    $('#room-name').trigger('focus')
+})
+
+// todo: Entering global room... when user doesn't specify room
+
+// todo: Entering "foobar" room... when user specifies room
