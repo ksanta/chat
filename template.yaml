@@ -176,9 +176,21 @@ Resources:
       AttributeDefinitions:
         - AttributeName: "connectionId"
           AttributeType: "S"
+        - AttributeName: "room"
+          AttributeType: "S"
       KeySchema:
         - AttributeName: "connectionId"
           KeyType: "HASH"
+      GlobalSecondaryIndexes:
+        - IndexName: roomIndex
+          KeySchema:
+            - AttributeName: "room"
+              KeyType: "HASH"
+          Projection:
+            ProjectionType: KEYS_ONLY
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
@@ -256,22 +268,6 @@ Resources:
       Principal: apigateway.amazonaws.com
 
 Outputs:
-  ConnectionsTableArn:
-    Description: "Connections table ARN"
-    Value: !GetAtt ConnectionsTable.Arn
-
-  OnConnectFunctionArn:
-    Description: "OnConnect function ARN"
-    Value: !GetAtt OnRegisterFunction.Arn
-
-  OnDisconnectFunctionArn:
-    Description: "OnDisconnect function ARN"
-    Value: !GetAtt OnDisconnectFunction.Arn
-
-  SendMessageFunctionArn:
-    Description: "SendMessage function ARN"
-    Value: !GetAtt SendMessageFunction.Arn
-
   WebSocketURI:
     Description: "The WSS Protocol URI to connect to"
     Value: !Join [ '', [ 'wss://', !Ref SimpleChatWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]

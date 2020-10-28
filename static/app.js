@@ -39,7 +39,6 @@ $(document).ready(function () {
 });
 
 // Make room text box active when the modal shows
-// todo: else if websockets is not supported, alert the user to that instead
 $('#room-modal').on('shown.bs.modal', function () {
     $('#room-name').trigger('focus')
 })
@@ -49,29 +48,27 @@ function connectWebSocket() {
     registerWebsocketHandlers()
 }
 
-// User enters a room
+// User chooses a room
 $("#room-form").submit(function (event) {
     event.preventDefault();
-    connectWebSocket()
+    $('#room-modal').modal('hide')
+});
+
+// Room modal finished hiding
+$('#room-modal').on('hidden.bs.modal', function () {
     roomName = $('#room-name').val()
+    if (roomName === "") {
+        roomName = "global"
+    }
+    connectWebSocket()
+    $('#msg').focus()
+})
+
+function displayJoinedRoom() {
     let item = document.createElement("div");
     item.innerHTML = "<b>Joined " + roomName + " room</b>";
     appendLog(item)
-    $('#room-modal').modal('hide')
-    $('#msg').focus()
-});
-
-// User enters the global room
-$('#room-modal').on('hidden.bs.modal', function (event) {
-    event.preventDefault();
-    if (roomName === "") {
-        connectWebSocket()
-        let item = document.createElement("div");
-        item.innerHTML = "<b>Joined global room</b>";
-        appendLog(item)
-        $('#msg').focus()
-    }
-})
+}
 
 function registerWebsocketHandlers() {
     // Register the user as soon as the socket connection is made
@@ -82,6 +79,7 @@ function registerWebsocketHandlers() {
             roomName: roomName
         }
         conn.send(JSON.stringify(msgToSend));
+        displayJoinedRoom()
     }
     conn.onclose = function (evt) {
         let item = document.createElement("div");
