@@ -25,6 +25,7 @@ window.onload = function () {
 
         let msgToSend = {
             type: "sendmessage",
+            roomName: roomName,
             data: msg.value
         }
         conn.send(JSON.stringify(msgToSend));
