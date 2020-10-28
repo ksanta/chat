@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -24,11 +25,20 @@ func init() {
 }
 
 func handler(request events.APIGatewayWebsocketProxyRequest) (events.APIGatewayProxyResponse, error) {
-	record := &model.Connection{
-		ConnectionId: request.RequestContext.ConnectionID,
+	// Extract player response from the request
+	registerMessage := model.Message{}
+	err := json.Unmarshal([]byte(request.Body), &registerMessage)
+	if err != nil {
+		return newErrorResponse("error unmarshalling JSON body", err)
 	}
 
-	itemMap, err := dynamodbattribute.MarshalMap(record)
+	user := &model.User{
+		ConnectionId: request.RequestContext.ConnectionID,
+		Room:         registerMessage.RoomName,
+	}
+	fmt.Printf("Registering user %+v\n", *user)
+
+	itemMap, err := dynamodbattribute.MarshalMap(user)
 	if err != nil {
 		return newErrorResponse("Failed to marshal storage item map", err)
 	}

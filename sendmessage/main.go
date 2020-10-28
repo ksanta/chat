@@ -35,23 +35,8 @@ func handler(event events.APIGatewayWebsocketProxyRequest) (events.APIGatewayPro
 		})
 	}
 
-	// Input param for a table scan
-	scanInput := &dynamodb.ScanInput{
-		TableName:            tableName,
-		ProjectionExpression: aws.String("connectionId"),
-	}
-
-	// Scan the table for all the connection ids
-	connectionsResult, err := svc.Scan(scanInput)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Body:       "Error scanning for connections",
-		}, err
-	}
-
 	var receivedMessage model.Message
-	err = json.Unmarshal([]byte(event.Body), &receivedMessage)
+	err := json.Unmarshal([]byte(event.Body), &receivedMessage)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
@@ -59,10 +44,35 @@ func handler(event events.APIGatewayWebsocketProxyRequest) (events.APIGatewayPro
 		}, err
 	}
 
-	waitGroup := sync.WaitGroup{}
-	waitGroup.Add(len(connectionsResult.Items))
+	// Query the global secondary index using room name
+	queryInput := &dynamodb.QueryInput{
+		TableName: tableName,
+		IndexName: aws.String("roomIndex"),
+		KeyConditions: map[string]*dynamodb.Condition{
+			"room": {
+				ComparisonOperator: aws.String("EQ"),
+				AttributeValueList: []*dynamodb.AttributeValue{
+					{
+						S: aws.String(receivedMessage.RoomName),
+					},
+				},
+			},
+		},
+	}
 
-	for _, item := range connectionsResult.Items {
+	// Query the table for all the connection ids for the room
+	queryOutput, err := svc.Query(queryInput)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Error querying for connections",
+		}, err
+	}
+
+	waitGroup := sync.WaitGroup{}
+	waitGroup.Add(len(queryOutput.Items))
+
+	for _, item := range queryOutput.Items {
 		// Send messages to each connected person concurrently
 		itemCopy := item
 		go func() {

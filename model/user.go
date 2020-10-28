@@ -1,5 +1,6 @@
 package model
 
-type Connection struct {
+type User struct {
 	ConnectionId string `json:"connectionId"`
+	Room         string `json:"room"`
 }
